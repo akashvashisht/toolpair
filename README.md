@@ -131,15 +131,28 @@ This table is based on each project's public docs and issues as of September 202
 
 ## Why this exists: the evidence
 
-This problem has been reported independently across frameworks, again and again:
+This problem has been reported independently across frameworks, again and again.
+Issue states below were checked on 2026-09-27.
 
-- [langchain#29637](https://github.com/langchain-ai/langchain/issues/29637): `trim_messages` separates tool calls from their results (still open)
-- [pydantic-ai#4728](https://github.com/pydantic/pydantic-ai/issues/4728): the reporter kept a 120-line sanitizer of their own in production
-- [semantic-kernel#12708](https://github.com/microsoft/semantic-kernel/issues/12708): a truncation reducer ignores tool-message boundaries
-- [autogen#7955](https://github.com/microsoft/autogen/issues/7955): popping messages from the middle leaves orphaned results
-- [claude-code#3886](https://github.com/anthropics/claude-code/issues/3886): `tool_use` ids without `tool_result` blocks
-- [Zoo-Code#1307](https://github.com/Zoo-Code-Org/Zoo-Code/issues/1307): images interleaved with tool results
-- [openai-agents-python#1797](https://github.com/openai/openai-agents-python/issues/1797): a `tool_result` with no `tool_use` in the previous message
+Still open:
+
+- [langchain#29637](https://github.com/langchain-ai/langchain/issues/29637) (filed 2025-02-06): `trim_messages` produces sequences that violate the provider's tool-pairing rules. It surfaced through `ChatAnthropic.get_num_tokens_from_messages`, which calls Anthropic's token-counting endpoint and errors on such sequences. Filed by a LangChain maintainer.
+- [autogen#7955](https://github.com/microsoft/autogen/issues/7955) (filed 2026-07-14): `TokenLimitedChatCompletionContext` can orphan a `FunctionExecutionResultMessage` mid-list when truncating.
+- [Zoo-Code#1307](https://github.com/Zoo-Code-Org/Zoo-Code/issues/1307) (filed 2026-08-20): tool results interleaved with image blocks break the Anthropic API.
+
+Closed:
+
+- [pydantic-ai#4728](https://github.com/pydantic/pydantic-ai/issues/4728) (filed 2026-03-18, closed 2026-07-14): the reporter maintained a ~120-line `sanitize_message_history` history processor in production, and wrote that *"once a conversation is poisoned, it stays poisoned"*. pydantic-ai has since merged [#6319](https://github.com/pydantic/pydantic-ai/pull/6319), which repairs pairing internally before every model request, so **pydantic-ai users get this repair out of the box and do not need this library for it**. A public validator is still open as [#5637](https://github.com/pydantic/pydantic-ai/issues/5637).
+- [semantic-kernel#12708](https://github.com/microsoft/semantic-kernel/issues/12708) (filed 2025-07-12): `ChatHistoryTruncationReducer` cut off a `TOOL_CALLS` message and left the following `TOOL` messages orphaned.
+- [claude-code#3886](https://github.com/anthropics/claude-code/issues/3886) (filed 2025-07-18): `tool_use` ids without `tool_result` blocks, after an interrupted tool.
+- [openai-agents-python#1797](https://github.com/openai/openai-agents-python/issues/1797) (filed 2025-09-24): with Anthropic extended thinking, `tool_result` blocks appeared before their `tool_use` blocks.
+
+Four of the seven are closed, which is worth reading carefully rather than as a
+weaker claim. Each framework hit this in production and then solved it
+separately, inside its own abstractions - pydantic-ai's fix alone added about
+1,800 lines. That is the case for a small shared library rather than seven
+private reimplementations, and it is the case for the people building directly
+on a provider SDK, who have no framework to fix it for them.
 
 Each of these is reproduced as a test in [`tests/test_real_world.py`](tests/test_real_world.py).
 
