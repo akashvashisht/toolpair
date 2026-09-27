@@ -172,13 +172,30 @@ Each of these is reproduced as a test in [`tests/test_real_world.py`](tests/test
 - **Anthropic server tools** (`server_tool_use`, `web_search_tool_result`, …) are left alone, because they're paired inside the assistant message.
 - **No live API calls:** the tests check against the documented rules and the error messages quoted above, not against the live APIs.
 
-## Roadmap
+## Project status
 
-- [ ] OpenAI Responses API (`function_call` / `function_call_output` items)
-- [ ] Gemini `contents` format (`functionCall` / `functionResponse`)
-- [ ] Optional adapters for LangChain and pydantic-ai message types
-- [ ] `summarize=` hook in `trim()` to compress dropped units instead of discarding them
-- [ ] Optional live contract tests against provider APIs (opt-in, bring your own key)
+**Complete and in maintenance. No further feature work planned** (decided 2026-09-27).
+
+The library does what it set out to do, is fully tested, and will be kept working. What
+changed is the case for extending it. Research after the 0.1.0 release established:
+
+- **pydantic-ai ships this repair in-framework.** [PR #6319](https://github.com/pydantic/pydantic-ai/pull/6319)
+  (merged 2026-07-14) repairs tool-call pairing internally before every model request, so
+  pydantic-ai users do not need this library for `repair()`.
+- **Pair-safe `trim()` is the part still genuinely unserved.** [langchain#29637](https://github.com/langchain-ai/langchain/issues/29637)
+  and [autogen#7955](https://github.com/microsoft/autogen/issues/7955) remain open, and no
+  framework-independent package treats a tool call plus its results as one indivisible unit.
+  If you came here for one thing, that is the thing.
+- **The framework adapters that were on the roadmap are dropped.** A pydantic-ai adapter is
+  now redundant, and a LangChain adapter cannot be adopted by LangChain users without
+  changes inside LangChain itself.
+
+Previously listed as roadmap items and explicitly **not** planned: the OpenAI Responses API
+format, Gemini `contents`, LangChain and pydantic-ai adapters, a `summarize=` hook in
+`trim()`, and live contract tests against provider APIs.
+
+Bug reports and pull requests are still welcome, and the limitations above are honest
+rather than temporary.
 
 ## Contributing
 
