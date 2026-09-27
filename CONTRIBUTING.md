@@ -6,7 +6,7 @@ dependencies, one job done well.
 ## Setup
 
 ```bash
-git clone https://github.com/YOUR_GITHUB_USERNAME/toolpair && cd toolpair
+git clone https://github.com/akashvashisht/toolpair && cd toolpair
 python -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"
 ```

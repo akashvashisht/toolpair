@@ -26,7 +26,7 @@ Once one of these gets into a stored conversation, every later request fails. As
 
 ```bash
 pip install toolpair            # once published; until then:
-pip install git+https://github.com/YOUR_GITHUB_USERNAME/toolpair
+pip install git+https://github.com/akashvashisht/toolpair
 ```
 
 ## Quick start
