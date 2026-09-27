@@ -1,0 +1,13 @@
+{
+  "conversation_id": "demo-123",
+  "messages": [
+    {"role": "system", "content": "You are a travel agent."},
+    {"role": "user", "content": "Find flights to Tokyo"},
+    {"role": "assistant", "content": null, "tool_calls": [
+      {"id": "call_1", "type": "function", "function": {"name": "search_flights", "arguments": "{\"to\": \"HND\"}"}}
+    ]},
+    {"role": "user", "content": "Actually, make it Osaka"},
+    {"role": "tool", "tool_call_id": "call_1", "content": "[3 flights]"},
+    {"role": "tool", "tool_call_id": "call_zzz", "content": "stale result from another session"}
+  ]
+}
